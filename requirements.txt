@@ -1,0 +1,8 @@
+packages\aos_com-1.0.19-py3-none-any.whl
+packages\corefw_c-2.2.1-cp38-abi3-win_amd64.whl
+pyserial
+intelhex
+matplotlib
+numpy
+pyzmq==25.1.2
+pyinstaller
