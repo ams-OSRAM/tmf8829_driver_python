@@ -269,7 +269,7 @@ if __name__ == "__main__":
     #####################################################
     default_client_cfg = {
         "measure_cfg": {},
-        "logging": {"combined_results": True, "3d_correction": True },
+        "logging": {"combined_results": True },
         "record_frames":3
     }
     #####################################################
@@ -366,8 +366,7 @@ if __name__ == "__main__":
 
     if _cfg_dict["select"] >= 1:
         print("The result frames have the distance in 0.25mm, but will be logged in mm! ")
-    if cfg["logging"]["3d_correction"]:
-        print("The result frames are point cloud corrected")
+
 
     if client.start_measurement():
         try:
@@ -390,12 +389,11 @@ if __name__ == "__main__":
                 if cfg["logging"]["combined_results"]:
 
                     _toMM = False
-                    _3dCorr = False
+
                     if _cfg_dict["select"] >= 1:
                         _toMM = True
-                    if cfg["logging"]["3d_correction"]:
-                        _3dCorr = True
-                    pixelResults = Tmf8829AppCommon.getFullPixelResult(frames=resultFrame, toMM=_toMM, pointCloud=_3dCorr, distanceToXYZ=True)
+
+                    pixelResults = Tmf8829AppCommon.getFullPixelResult(frames=resultFrame, toMM=_toMM, pointCloud=False, distanceToXYZ=True)
 
                     # log the header of the first result frame
                     fheader = tmf8829FrameHeader.from_buffer_copy( bytearray(resultFrame[0])[Tmf8829AppCommon.PRE_HEADER_SIZE: \

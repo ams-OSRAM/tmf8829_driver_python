@@ -4,8 +4,5 @@
         "period": 33,                 
         "iterations": 600                             
     },
-    "logging": {
-        "3d_correction": true
-    },
     "record_frames":3
 }

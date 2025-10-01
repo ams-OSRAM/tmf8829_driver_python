@@ -28,7 +28,7 @@ num_of_measurements = 1
 use_histograms = 1
 use_iterations = 500
 
-results3dcorrected = True
+results3dcorrected = False
 resultsInXYZ = True
 ###################################################################################
 ## Example for the Tmf8829Logger 

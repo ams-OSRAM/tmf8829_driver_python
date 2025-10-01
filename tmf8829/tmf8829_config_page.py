@@ -1062,10 +1062,25 @@ class Tmf8829_config_page:
 			mask  = 255
 			width = 8
 			shift = 0
-			_PERSISTENCE = 0 # persistence algorithm enabled
-			_MOTION = 1 # motion detection, (also int_persistence must be set to >=1 in field TMF8829_CFG_INT_PERSISTENCE)
+			_PERSISTENCE = 0 # persistence algorithm enabled, Persistence Interrupt is bit 1
+			_MOTION = 1 # motion detection, Motion Interrupt is bit 1, (also int_persistence must be set to >=1 in field TMF8829_CFG_INT_PERSISTENCE),
+			_MOTION_ALWAYS_RESULTS = 2 # same as motion detection but result frames are always published, Motion Interrupt is bit 1, (also int_persistence must be set to >=1 in field TMF8829_CFG_INT_PERSISTENCE)
 		def __init__(self):
 			self.post_processing = self._post_processing.reset
+
+	class TMF8829_CFG_PROX_DISTANCE(ctypes.LittleEndianStructure):
+		addr = 0x6e
+		_pack_ = 1
+		_fields_ = [
+			("prox_distance",ctypes.c_uint8,8),
+			]
+		class _prox_distance:
+			reset = 0
+			mask  = 255
+			width = 8
+			shift = 0
+		def __init__(self):
+			self.prox_distance = self._prox_distance.reset
 
 	class TMF8829_CFG_CROP_TOP_X(ctypes.LittleEndianStructure):
 		addr = 0x70
@@ -1556,6 +1571,7 @@ class Tmf8829_config_page:
 		self.TMF8829_CFG_INT_THRESHOLD_HIGH_MSB = Tmf8829_config_page.TMF8829_CFG_INT_THRESHOLD_HIGH_MSB()
 		self.TMF8829_CFG_INT_PERSISTENCE = Tmf8829_config_page.TMF8829_CFG_INT_PERSISTENCE()
 		self.TMF8829_CFG_POST_PROCESSING = Tmf8829_config_page.TMF8829_CFG_POST_PROCESSING()
+		self.TMF8829_CFG_PROX_DISTANCE = Tmf8829_config_page.TMF8829_CFG_PROX_DISTANCE()
 		self.TMF8829_CFG_CROP_TOP_X = Tmf8829_config_page.TMF8829_CFG_CROP_TOP_X()
 		self.TMF8829_CFG_CROP_TOP_Y = Tmf8829_config_page.TMF8829_CFG_CROP_TOP_Y()
 		self.TMF8829_CFG_CROP_BOTTOM_X = Tmf8829_config_page.TMF8829_CFG_CROP_BOTTOM_X()

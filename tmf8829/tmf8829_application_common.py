@@ -396,8 +396,8 @@ class Tmf8829AppCommon():
             frames: list[bytearray] the result frames in the right order as received by the device.
             toMM: Changes the distance results from 0.25mm to mm. Note do not use this option if the results are in bins
             deleteNone: Remove None items from MP Results.
-            pointCloud: do point cloud correction
-            distanceToXYZ: only for pointCloud correction, reports instead of a distance the xyz values
+            pointCloud: do point cloud correction, only done if distanceToXYZ = False
+            distanceToXYZ: reports distance the xyz values, if this option is used, the distance will not be point cloud corrected.
         Returns:
             List[row][col] tmf8829MPResult structures
         """
@@ -417,7 +417,7 @@ class Tmf8829AppCommon():
         if deleteNone:
             pixelResults = Tmf8829AppCommon.pixelResultsDeleteNoneParam(pixelResults)
 
-        if pointCloud == True:
+        if (pointCloud == True) or (distanceToXYZ  == True):
             Tmf8829AppCommon.pixelResults3dPointcloudCorr(pixelResults, fpMode, reportXYZ= distanceToXYZ)
 
         return pixelResults
@@ -467,7 +467,7 @@ class Tmf8829AppCommon():
                     if peak['distance'] != None:
                         if reportXYZ:
                             distanceCorr = peak['distance'] / zCorrSimple
-                            peak.pop("distance")
+                            # peak.pop("distance") do not remove distance 
                             peak['x']= round(distanceCorr*x_dist)
                             peak['y']= round(distanceCorr*y_dist)
                             peak['z']= round(distanceCorr)

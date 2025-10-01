@@ -78,7 +78,7 @@ class Tmf8829Device:
             self.gpio_hal.com.gpioSet(w_mask=self.gpio_hal.com.enable_pin, value=self.gpio_hal.com.enable_pin) 
             time.sleep(0.003) # wait for 3 milliseconds until the device comes up.
             if send_wake_up_sequence:
-                return self.powerUp()
+                return self.wakeUp(powerup_select=Tmf8829HostRegs.ENABLE._powerup_select._FORCE_BOOTMONITOR)    #force boot monitor
             return True
         return False
 
@@ -112,28 +112,19 @@ class Tmf8829Device:
         self.io.regWrite( self.reg.ENABLE, powerup_select=1, pon=1 )    # make sure device is powered
         self.reset()
 
-    def powerUp(self) -> bool:
-        """Power up the TMF8829"""
-        self.io.regWrite( self.reg.ENABLE, pon=1 )  # request a power up = wakeup
-        time.sleep(0.003)                           # wait for 3 milliseconds until the device comes up.
-        self.io.regRead( self.reg.ENABLE )          # read back
-        if self.reg.ENABLE.cpu_ready:
-            return True
-        return False
-
-    def wakeUp(self) -> bool:
+    def wakeUp(self, powerup_select = Tmf8829HostRegs.ENABLE._powerup_select._RAM) -> bool:
         """wakeup up the TMF8829"""
-        self.io.regWrite( self.reg.ENABLE, pon=1, powerup_select = 2 )  # request a power up = wakeup 
+        self.io.regWrite( self.reg.ENABLE, pon=1, powerup_select = powerup_select )  # request a power up = wakeup 
         time.sleep(0.003)                           # wait for 3 milliseconds until the device comes up.
         self.io.regRead( self.reg.ENABLE )          # read back
         if self.reg.ENABLE.cpu_ready:
             return True
         return False
     
-    def powerDown(self) -> bool:
+    def gotoStandby(self) -> bool:
         """Power down the TMF8829"""
         if self.isDeviceWakeup():
-            self.io.regWrite( self.reg.ENABLE, poff=1)  # request power down
+            self.io.regWrite( self.reg.ENABLE, poff=1)  # request standby
             time.sleep(0.003)                           # wait for xx milliseconds until the device powers down
             self.io.regRead( self.reg.ENABLE )          # read again from HW to see new state
             if self.reg.ENABLE.cpu_ready == 0 and ( self.reg.ENABLE.standby_mode == 1 or  self.reg.ENABLE.timed_standby_mode == 1 ):

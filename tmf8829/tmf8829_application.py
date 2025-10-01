@@ -16,12 +16,15 @@ from tmf8829_bootloader import Tmf8829Bootloader
 from aos_com.hal_register_io import HalRegisterIo
 from register_page_converter import RegisterPageConverter
 
+# additional interrupt bits 
+TMF8829_INT_MOTION      = 0x02  # motion interrupt bit
+TMF8829_INT_PROXIMITY   = 0x04  # proximity interrupt bit
 
 class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
     """The TMF8829 application class for the Shield Evm Board.
     """
     
-    VERSION = 1.10
+    VERSION = 1.12
     """Version log
     - 1.0 First  version
     - 1.1 add FP mode 48x32
@@ -35,6 +38,7 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
     - 1.9 added info parameter readout
     - 1.10 added support for dual mode
     - 1.11 splitted up tmf8829_application to tmf8829_application_common and tmf8829_application
+    - 1.12 support for motion detection and proximity 
     """
 
     def __init__(self, hal:HalRegisterIo, gpio_hal:HalRegisterIo=None ):
@@ -191,7 +195,7 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
                   spr_spec_single_edge:int=None,spr_spec_cfg:int=None,spr_spec_amp:int=None, add_100_mm_offset:int=None,
                   mp_top_x:int=None, mp_top_y:int=None, mp_bottom_x:int=None, mp_bottom_y:int=None, ref_mp:int=None ,
                   motion_distance:int=None, detect_snr:int=None, release_snr:int=None, motion_adjacent:int=None,
-                  dual_mode:int=None, high_accuracy_iterations:int=None ):
+                  dual_mode:int=None, high_accuracy_iterations:int=None, prox_distance:int=None ):
         """Function to reconfigure the device.
            The config page is loaded with the CMD_LOAD_CONFIG_PAGE command.
            The config registers are modified and the new config page is written with the CMD_WRITE_PAGE command.
@@ -275,6 +279,7 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
             motion_adjacent(int,optional):number of adjacent pixel that must have motion to report it. defaults to None.
             dual_mode(int,optional): set to 1 to automatically do dual integration, defaults to None.
             high_accuracy_iterations(int,optional): 16-bit unsigned integer, short range kilo iterations, defaults to None.
+            prox_distance(int,optional): 8-bit unsigned integer, proximity detection distance in mm, defaults to None
             """
         self.sendCommand( Tmf8829AppRegs.TMF8829_CMD_STAT._cmd_stat._CMD_LOAD_CONFIG_PAGE )
         if (period != None):
@@ -494,6 +499,8 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
         if (dual_mode != None):
             self.hal.tx( Tmf8829ConfigRegs.TMF8829_CFG_ENABLE_DUAL_MODE.addr, dual_mode )
             self.cfg_dualMode = dual_mode
+        if (prox_distance != None):
+            self.hal.tx( Tmf8829ConfigRegs.TMF8829_CFG_PROX_DISTANCE.addr, prox_distance )
 
         self.sendCommand( Tmf8829AppRegs.TMF8829_CMD_STAT._cmd_stat._CMD_WRITE_PAGE )
 
