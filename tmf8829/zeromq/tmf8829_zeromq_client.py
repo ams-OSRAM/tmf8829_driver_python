@@ -31,7 +31,7 @@ from aos_com.register_io import ctypes2Dict
 class ZeroMqClient:
     """ZeroMQ client"""
    
-    VERSION = 0x0003
+    VERSION = 0x0004
     """Version 
     - 1 First zeromq client release version
     - 2 Second logger versions
@@ -43,6 +43,7 @@ class ZeroMqClient:
     - 4 option to save previous data also uncompressed (configuration changed at measurement)
         fix, check if filename exists also for gz files
         for storage use os pathname
+        store 3d point cloud values and distance
     """
 
     def __init__(self) -> None:

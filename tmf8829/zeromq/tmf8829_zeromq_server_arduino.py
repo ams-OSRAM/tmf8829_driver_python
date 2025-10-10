@@ -17,8 +17,6 @@ from typing import  List
 from time import sleep
 
 ### DRIVER ATTRIBUTES ###
-#BAUDRATE = 115200
-BAUDRATE = 2000000
 
 class CommandError(Exception):
     """Command error."""
@@ -75,10 +73,10 @@ class ZeroMqArduinoServer(ZeroMqServer):
     APPLICATION_ID = 0x01
     BOOTLOADER_ID = 0x80
 
-    def __init__(self, port: str, cmd_poll_interval=1.0) -> None:
+    def __init__(self, port: str, cmd_poll_interval=1.0, baudrate=2000000) -> None:
         super().__init__(cmd_poll_interval=cmd_poll_interval)
         
-        self._com = Serial(baudrate=BAUDRATE, timeout=0.1)
+        self._com = Serial(baudrate=baudrate, timeout=0.1)
         self._com.port = port
         self._cmd_resp_lines = Queue()
         self._read_thread: Optional[Thread] = None
@@ -87,16 +85,35 @@ class ZeroMqArduinoServer(ZeroMqServer):
         self.rawHistograms = 0
         self.hostType = TMF8829_ZEROMQ_HOST_ARDUINO_BOARD
         self._result_object = bytearray()
-        
-    @staticmethod
-    def device_connected() -> List[str]:
-        """
-        device connected
 
+    @staticmethod
+    def print_connected_com_ports():
+        """
+        print connected com ports
+        """
+        ports = list_ports.comports()
+        for port in ports:
+            print(f"Com Port Device: {port.device}, Description: {port.description}, HWID: {port.hwid}")
+        return
+
+    @staticmethod
+    def device_connected(dev="Uno") -> List[str]:
+        """
+        Return a list of devices that are connected.
+        Args:
+          dev: "Uno" for Arduino Uno,"Zero" for Arduino Zero; other devices not implemented 
         Returns:
             List[str]: list ports
         """
-        return [e.name for e in list_ports.grep(r"USB VID:PID=2341.*")]
+        dl = []
+        if dev == "Uno":
+            dl = [e.name for e in list_ports.grep(r"USB VID:PID=2341.*")]
+        elif dev == "Zero":
+            dl = [e.name for e in list_ports.grep(r"USB VID:PID=03EB:2157*")]
+        else:
+            logging.info("device search not implemented")
+            
+        return dl
     
     def _clear_queue(self, queue: Queue) -> None:
         """
@@ -266,7 +283,7 @@ class ZeroMqArduinoServer(ZeroMqServer):
         """
         logger.info("--XXX Reopen device connection. XXX--")
         
-        self._close_communication_to_device()
+        self._com.close()
         sleep(0.1)
         self._open_communication_to_device()
 
@@ -310,16 +327,6 @@ class ZeroMqArduinoServer(ZeroMqServer):
                     state = line.split(b"=")[1]             
         except Exception as exc:
             state = FwStates.UNKNOWN.value
-            
-
-        if state != FwStates.STOPPED.value:
-            logger.info("Could not stop the measurement. Try a second time!!!")
-            try: # Try once more 
-                for line in self._send_command(Commands.STOP_MEAS):
-                    if line.startswith(b"state"):
-                        state = line.split(b"=")[1]             
-            except Exception as exc:
-                state = FwStates.UNKNOWN.value
 
         self._meas_running = False
         self._nr_subframes = 0
@@ -330,7 +337,7 @@ class ZeroMqArduinoServer(ZeroMqServer):
           logger.info("{} Result processing stopped.".format(time.time()))
           logger.info("Number lost result frames are at least {}".format(self.lost_results))
         else:
-            logger.info("Stop the measurement FAILED. Try a second time!!!")
+            logger.info("Stop the measurement FAILED. Re-open com!!!")
             self._reopen_communication_to_device
 
         return self._meas_running
@@ -430,17 +437,24 @@ class ZeroMqArduinoServer(ZeroMqServer):
 #####################################################################################
 
 if __name__ == "__main__":
-    import pathlib
+
+    BAUDRATE=2000000
 
     logging.basicConfig(level=logging.DEBUG,format='%(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s')
-    
+    ZeroMqArduinoServer.print_connected_com_ports()
+
     com_port = ZeroMqArduinoServer.device_connected()
     
     if len(com_port) >= 1: 
-        logging.info("Board found Com {}".format(com_port[0]))
-        server = ZeroMqArduinoServer(port= com_port[0], cmd_poll_interval = 0.01)
-        server.start(cmd_addr= TMF8829_ZEROMQ_CMD_SERVER_ADDR, result_addr=TMF8829_ZEROMQ_RESULT_SERVER_ADDR)
+        logging.info("Arduino Uno Board found Com {}".format(com_port[0]))
+    else:
+        logging.info("No Arduino Uno Board found")
+        com_port = ZeroMqArduinoServer.device_connected("Zero")
+        BAUDRATE=1000000
 
+    if len(com_port) >= 1: 
+        server = ZeroMqArduinoServer(port= com_port[0], cmd_poll_interval = 0.01, baudrate=BAUDRATE)
+        server.start(cmd_addr= TMF8829_ZEROMQ_CMD_SERVER_ADDR, result_addr=TMF8829_ZEROMQ_RESULT_SERVER_ADDR)
         try:
             while True:
                 server.process()

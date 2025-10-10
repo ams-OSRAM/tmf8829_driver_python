@@ -4,5 +4,5 @@ pyserial
 intelhex
 matplotlib
 numpy
-pyzmq==25.1.2
+pyzmq
 pyinstaller
