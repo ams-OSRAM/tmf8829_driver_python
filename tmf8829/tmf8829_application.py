@@ -179,6 +179,31 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
             if time.time() > _max_time:
                 raise Exception( "Error command {} timeout".format( cmd ))
 
+    def sendCommandSwitchI2CSlaveAddress(self, i2c_dev_addr, timeout:float=1.5):
+        """Special function that is used to switch the I2C slave address for the TMF8829.
+        Args:
+            i2c_dev_addr: the shifted (8-bit) i2c slave address that shall be used after the config page write command.
+            timeout: waiting time for the device to respond. 
+        """
+        cmd = Tmf8829AppRegs.TMF8829_CMD_STAT._cmd_stat._CMD_WRITE_PAGE
+        self.hal.tx( Tmf8829AppRegs.TMF8829_CMD_STAT.addr, [ cmd ] )
+        _max_time = time.time() + timeout
+        _original_dev_addr = self.hal.dev_addr
+        self.hal.dev_addr = i2c_dev_addr >> 1
+        while True:
+            _resp = self.hal.txRx([Tmf8829AppRegs.TMF8829_CMD_STAT.addr], 2 ) # read back also previous command
+            if len(_resp) and _resp[0] < Tmf8829AppRegs.TMF8829_CMD_STAT._cmd_stat._CMD_MEASURE:
+                if _resp[0] > Tmf8829AppRegs.TMF8829_CMD_STAT._cmd_stat._STAT_ACCEPTED:
+                    raise Exception( "Error command {} failed with {} (i2c_slave_addr=0x{})".format( cmd, _resp[0], hex(self.hal.dev_addr) ) )
+                else:
+                    if _resp[0] == Tmf8829AppRegs.TMF8829_CMD_STAT._cmd_stat._STAT_OK:
+                        return list(_resp)
+            if time.time() > _max_time:
+                if self.hal.dev_addr == _original_dev_addr: # could not see a response on main or 
+                    raise Exception( "Error command {} timeout".format( cmd ))
+                self.hal.dev_addr = _original_dev_addr
+                _max_time = time.time() + timeout
+
     def configure(self, period:int = None, iterations:int = None, fp_mode:int = None, spad_select:int = None, ref_spad_select:int = None, dead_time:int = None,
                   nr_peaks:int = None, signal_strength:bool = None, noise_strength:bool = None, xtalk:bool = None,
                   full_noise:bool = None, histograms:int = None, publish:int = None, bdv_temp_sensor:int = None,
@@ -195,7 +220,7 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
                   spr_spec_single_edge:int=None,spr_spec_cfg:int=None,spr_spec_amp:int=None, add_100_mm_offset:int=None,
                   mp_top_x:int=None, mp_top_y:int=None, mp_bottom_x:int=None, mp_bottom_y:int=None, ref_mp:int=None ,
                   motion_distance:int=None, detect_snr:int=None, release_snr:int=None, motion_adjacent:int=None,
-                  dual_mode:int=None, high_accuracy_iterations:int=None, prox_distance:int=None ):
+                  dual_mode:int=None, high_accuracy_iterations:int=None, prox_distance:int=None, hv_cp_overload_detect:int=None, i2c_slave_address:int=None ):
         """Function to reconfigure the device.
            The config page is loaded with the CMD_LOAD_CONFIG_PAGE command.
            The config registers are modified and the new config page is written with the CMD_WRITE_PAGE command.
@@ -280,6 +305,8 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
             dual_mode(int,optional): set to 1 to automatically do dual integration, defaults to None.
             high_accuracy_iterations(int,optional): 16-bit unsigned integer, short range kilo iterations, defaults to None.
             prox_distance(int,optional): 8-bit unsigned integer, proximity detection distance in mm, defaults to None
+            hv_cp_overload_detect(int,optional): set to 1 if HV CP overload should influcence the algorithm, defaults to None.
+            i2c_slave_address(int,optional): 8-bit unsigned integer, has to be the shifted I2C slave address, defaults to None.
             """
         self.sendCommand( Tmf8829AppRegs.TMF8829_CMD_STAT._cmd_stat._CMD_LOAD_CONFIG_PAGE )
         if (period != None):
@@ -501,7 +528,14 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
             self.cfg_dualMode = dual_mode
         if (prox_distance != None):
             self.hal.tx( Tmf8829ConfigRegs.TMF8829_CFG_PROX_DISTANCE.addr, prox_distance )
-
+        if (hv_cp_overload_detect != None):
+            self.hal.tx( Tmf8829ConfigRegs.TMF8829_CFG_HV_CP_OVERLOAD_DETECT.addr, hv_cp_overload_detect )
+        if (i2c_slave_address != None):
+            self.hal.tx( Tmf8829ConfigRegs.TMF8829_CFG_I2C_ADDRESS.addr, i2c_slave_address )
+            from aos_com.i2c_hal_register_io import I2cHalRegisterIo
+            if isinstance( self.hal, I2cHalRegisterIo ):    # if we use spi for communication, there is no need to do a special handling here
+                self.sendCommandSwitchI2CSlaveAddress(i2c_slave_address)
+                return
         self.sendCommand( Tmf8829AppRegs.TMF8829_CMD_STAT._cmd_stat._CMD_WRITE_PAGE )
 
     def loadConfig(self) -> bytearray:

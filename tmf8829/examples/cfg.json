@@ -2,6 +2,7 @@
     "preconfig": "CMD_LOAD_CFG_16X16",
     "measure_cfg": {
         "period":33,                 
-        "iterations": 600                             
+        "iterations": 600,
+        "hv_cp_overload_detect": 1                             
     }
 }

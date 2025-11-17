@@ -4,6 +4,7 @@
 # *                                                                           *
 # *FOR FULL LICENSE TEXT SEE LICENSES-MIT.TXT                                 *
 # *****************************************************************************
+
 import ctypes
 
 class Tmf8829_config_page:
@@ -658,6 +659,20 @@ class Tmf8829_config_page:
 			_reserved = 3 # reserved
 		def __init__(self):
 			self.dual_mode = self._dual_mode.reset
+
+	class TMF8829_CFG_HV_CP_OVERLOAD_DETECT(ctypes.LittleEndianStructure):
+		addr = 0x4d
+		_pack_ = 1
+		_fields_ = [
+			("hv_cp_overload_detect",ctypes.c_uint8,1),
+			]
+		class _hv_cp_overload_detect:
+			reset = 0
+			mask  = 1
+			width = 1
+			shift = 0
+		def __init__(self):
+			self.hv_cp_overload_detect = self._hv_cp_overload_detect.reset
 
 	class TMF8829_CFG_ALG_PEAK_BINS(ctypes.LittleEndianStructure):
 		addr = 0x50
@@ -1542,6 +1557,7 @@ class Tmf8829_config_page:
 		self.TMF8829_CFG_HA_KILO_ITERATIONS_LSB = Tmf8829_config_page.TMF8829_CFG_HA_KILO_ITERATIONS_LSB()
 		self.TMF8829_CFG_HA_KILO_ITERATIONS_MSB = Tmf8829_config_page.TMF8829_CFG_HA_KILO_ITERATIONS_MSB()
 		self.TMF8829_CFG_ENABLE_DUAL_MODE = Tmf8829_config_page.TMF8829_CFG_ENABLE_DUAL_MODE()
+		self.TMF8829_CFG_HV_CP_OVERLOAD_DETECT = Tmf8829_config_page.TMF8829_CFG_HV_CP_OVERLOAD_DETECT()
 		self.TMF8829_CFG_ALG_PEAK_BINS = Tmf8829_config_page.TMF8829_CFG_ALG_PEAK_BINS()
 		self.TMF8829_CFG_ALG_REF_PEAK_BINS = Tmf8829_config_page.TMF8829_CFG_ALG_REF_PEAK_BINS()
 		self.TMF8829_CFG_ALG_DISTANCE = Tmf8829_config_page.TMF8829_CFG_ALG_DISTANCE()
