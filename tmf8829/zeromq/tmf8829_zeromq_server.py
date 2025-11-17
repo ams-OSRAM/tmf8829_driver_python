@@ -36,7 +36,8 @@ class ZeroMqEVMServer(ZeroMqServer):
     - 1 First zeromq server release version
     - 2 Second zeromq server release version
         SET_PRE_CONFIGURATION added
-    - 3 Dual mode support 
+    - 3 Dual mode support
+    -   EVM Version 2.2.5 Set wakeup with startup  
     """
 
     APPLICATION_ID = 0x01
@@ -119,7 +120,7 @@ class ZeroMqEVMServer(ZeroMqServer):
             raise Exception("ERROR no communication, exiting") 
         self.app.disable()
         time.sleep(0.03)
-        self.app.enable(send_wake_up_sequence=False)
+        self.app.enable(send_wake_up_sequence=True)
         
         if self._use_spi:
             self.app.blCmdI2cOff()                               # disable I2C interface to use pins for SWD

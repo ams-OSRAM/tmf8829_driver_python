@@ -134,7 +134,7 @@ TMF8829_ZEROMQ_HOST_RASPBERRY_BOARD = 3 # macro
 TMF8829_ZEROMQ_HOST_H5_BOARD = 4 # macro
 TMF8829_ZEROMQ_HEADER_INFO_SIZE = 64 # macro
 TMF8829_ZEROMQ_IDENTIFY_INFO_SIZE = 56 # macro
-EVM_VERSION = "2.2.4   " # macro
+EVM_VERSION = "2.2.5   " # macro
 class struct__tmf8829ZmqDeviceInfo(Structure):
     pass
 
