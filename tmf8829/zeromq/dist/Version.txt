@@ -1,0 +1,56 @@
+######################################
+# Version
+######################################
+
+- v 0.1.0
+  svn rev. 3888
+  First internal Release
+- v 1.0.0
+  svn rev. 3888
+  First external Release
+  changes to 0.1.0
+  only description in tmf8829_config_page.txt and Readme.md
+  svn rev. 3910
+- v 1.1.0
+  svn rev. 4148
+  second external Release
+  new firmware
+- v 1.2.0
+  svn rev. 4204
+  third external Release
+  new firmware
+  preconfig cmd
+  json output files has additional info
+  json output general info changed
+  json output file , distance in mm
+- v 1.3.0
+  svn rev. 4257
+  fourth external Release
+  new firmware 1.2.38 svn 4254
+  json output files has additional temperature
+- v 2.1.0
+  firmware svn rev 4317
+  1st external release for A1 material
+  GUI 2.7.1 or higher is required
+- v 2.2.0
+  firmware svn rev 4318
+  2st external release for A1 material
+  GUI 2.7.7 or higher is required
+- Logger V3
+  svn release 4399 
+  also for linux host  
+- v 2.2.1 -unofficial release
+  first version with dual mode support
+- v 2.2.4
+  svn release 4506
+  GUI 2.11.11 or higher expected
+  new hex file
+  functionalities updated to new firmware
+  point cloud correction added
+- v 2.2.5
+  svn release 4526
+  send wake up at startup
+  configuration:_hv_cp_overload_detect, i2c_slave_address
+  new hex file
+ 
+  

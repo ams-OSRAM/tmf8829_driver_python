@@ -1,0 +1,15 @@
+######################################
+# Version
+######################################
+
+Note: Versions for the tmf8829_zeromq_client.exe.
+The client is using the logger functionality.
+
+- v1 First zeromq client release version
+- v2 Second release version
+     changes in logging format
+- v3 local host and linux host check
+     dual mode support
+     point cloud correction
+- v3.1 
+    point cloud correction an distance reported
