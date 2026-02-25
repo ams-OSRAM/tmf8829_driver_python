@@ -317,7 +317,7 @@ class ZeroMqServer:
     def process(self):
         """Function checks on both sockets if there are things to be done. """
         _time = time.time()
-        if not self._meas_running or self._last_cmd_poll + self._cmd_poll_interval < _time: # when not running poll faster for commands
+        if (not self._meas_running) or ((self._last_cmd_poll + self._cmd_poll_interval) < _time): # when not running poll faster for commands
             if self._cmd_socket.poll(timeout=1) != 0:     # events queued within our time limit
                 request = Tmf8829zeroMQRequestMessage(client_id=TMF8829_ZEROMQ_CLIENT_NOT_IDENTIFIED,buffer=self._cmd_socket.recv())
                 logger.debug("Received: %s", request)

@@ -27,7 +27,7 @@ TOF_GPIO4 = 1 << corefw_c.evm_h5.PioId.IXC2_SCL
 TOF_GPIO5 = 1 << corefw_c.evm_h5.PioId.IXC2_SDA
 TOF_GPIO6 = 1 << corefw_c.evm_h5.PioId.GPIO0
 
-def createTmf8829( use_spi=True, i2c_slave_addr=FRESNEL_I2C_ADDR, spi_mode= 0, log=False):
+def createTmf8829( use_spi=True, i2c_slave_addr=FRESNEL_I2C_ADDR, spi_mode=0, log=False, use_i3c=False ):
     """Function creates the needed communication """
     import sys
     from tmf8829_application import Tmf8829Application
@@ -35,12 +35,17 @@ def createTmf8829( use_spi=True, i2c_slave_addr=FRESNEL_I2C_ADDR, spi_mode= 0, l
     print(sys.path)
     
     com = Host( log=log )
-    if use_spi:
-        from aos_com.spi_hal_register_io import SpiHalRegisterIo as Hal
-        hal = Hal( ic_com=com, spi_mode=spi_mode)
-    else:
-        from aos_com.i2c_hal_register_io import I2cHalRegisterIo as Hal
+    
+    if use_i3c:
+        from aos_com.i3c_hal_register_io import I3cHalRegisterIo as Hal
         hal = Hal( ic_com=com, dev_addr = i2c_slave_addr )
+    else:
+        if use_spi:
+            from aos_com.spi_hal_register_io import SpiHalRegisterIo as Hal
+            hal = Hal( ic_com=com, spi_mode=spi_mode)
+        else:
+            from aos_com.i2c_hal_register_io import I2cHalRegisterIo as Hal
+            hal = Hal( ic_com=com, dev_addr = i2c_slave_addr )
     
     return Tmf8829Application( hal=hal, gpio_hal=hal )
 

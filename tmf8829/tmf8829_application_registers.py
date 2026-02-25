@@ -4,6 +4,7 @@
 # *                                                                           *
 # *FOR FULL LICENSE TEXT SEE LICENSES-MIT.TXT                                 *
 # *****************************************************************************
+
 import ctypes
 
 class Tmf8829_application_registers:
