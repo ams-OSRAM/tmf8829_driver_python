@@ -24,7 +24,7 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
     """The TMF8829 application class for the Shield Evm Board.
     """
     
-    VERSION = 1.12
+    VERSION = 1.13
     """Version log
     - 1.0 First  version
     - 1.1 add FP mode 48x32
@@ -39,6 +39,7 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
     - 1.10 added support for dual mode
     - 1.11 splitted up tmf8829_application to tmf8829_application_common and tmf8829_application
     - 1.12 support for motion detection and proximity 
+    - 1.13 check in stop Measurement if device is wakeup; for standby timed mode
     """
 
     def __init__(self, hal:HalRegisterIo, gpio_hal:HalRegisterIo=None ):
@@ -122,6 +123,10 @@ class Tmf8829Application(Tmf8829Bootloader, Tmf8829AppCommon):
         Return:
             int: the read-back response
         """
+
+        if not self.isDeviceWakeup():
+            self.wakeUp()
+            
         self.enableInt( 0 )                                             # disable all interrupts  
         self.clearIntStatus( 0xFF )                                     # clear any old pending interrupts
         return self.sendCommand(cmd=Tmf8829AppRegs.TMF8829_CMD_STAT._cmd_stat._CMD_STOP, wait_only_for_ok=True)

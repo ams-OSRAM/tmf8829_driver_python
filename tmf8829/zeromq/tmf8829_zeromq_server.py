@@ -31,13 +31,14 @@ class ZeroMqEVMServer(ZeroMqServer):
     to allow to configure the device.
     The data socket provides unidirectional measurement results and optional histograms.
     """
-    VERSION = 0x0003
+    VERSION = 0x0004
     """Version 
     - 1 First zeromq server release version
     - 2 Second zeromq server release version
         SET_PRE_CONFIGURATION added
     - 3 Dual mode support
     -   EVM Version 2.2.5 Set wakeup with startup  
+    - 4 for standby timed mode: check in stop measurement if device is Wakeup
     """
 
     APPLICATION_ID = 0x01
