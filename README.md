@@ -1,10 +1,10 @@
 # Python files for the tmf8829 device 
 
-Python version 3.10.11 or high is required.
+Python version 3.10.11 or higher is required.
 
 ## Virtual environment
 
-Recommendation is to set-up a virtual environment. Open you favorite Windows PowerShell, VisualStudio Code etc.
+Recommendation is to set-up a virtual environment. Open your favourite  Windows PowerShell, VisualStudio Code etc.
 To install a virtual environment named env, and use it:   
 python -m venv env    
 ./env/Scripts/Activate.ps1    
@@ -14,7 +14,7 @@ python -m venv env
 To run the scripts in this folder you need to install the packages in the requirements.txt file with:    
 pip install -r requirements.txt
 
-All needed python packages are located in the subdirectory packages.
+All needed python packages are in the subdirectory packages.
 
 ## Folder and sub-folders:
 
