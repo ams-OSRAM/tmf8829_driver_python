@@ -1,5 +1,9 @@
-packages\aos_com-1.0.19-py3-none-any.whl
-packages\corefw_c-2.2.1-cp38-abi3-win_amd64.whl
+txt
+
+corefw_c @ file:packages/corefw_c-2.3.1-cp38-abi3-win_amd64.whl ; sys_platform == 'win32' and platform_machine == 'AMD64'
+corefw_c @ file:packages/corefw_c-2.3.1-cp38-abi3-linux_x86_x64.whl ; sys_platform == 'linux' and platform_machine == 'AMD64'
+corefw_c @ file:packages/corefw_c-2.3.1-cp38-abi3-linux_aarch64.whl ; sys_platform == 'linux' and platform_machine == 'aarch64'
+packages/aos_com-1.0.23-py3-none-any.whl
 pyserial
 intelhex
 matplotlib
