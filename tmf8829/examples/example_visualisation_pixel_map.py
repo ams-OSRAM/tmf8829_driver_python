@@ -68,7 +68,7 @@ if __name__ == "__main__":
     #------------------------------------------------------------
     columns = Tmf8829Application.pixelColumns(_fpMode)
     rows = Tmf8829Application.pixelRows(_fpMode)
-    imFpPixel, imRefPixelT0, imRefPixelT1 = Tmf8829PlotPixelMap.createEmptyPixelMapPlot(columns, rows)
+    #imFpPixel, imRefPixelT0, imRefPixelT1 = Tmf8829PlotPixelMap.createEmptyPixelMapPlot(columns, rows)
     imFpPixelDist = Tmf8829PlotPixelDistMap.createEmptyPixelDistMapPlot(columns, rows)
 
     #------------------------------------------------------------
@@ -88,8 +88,8 @@ if __name__ == "__main__":
         #                 peaks['distance']= distance1mm
         
         
-        refframe = tmf8829RefSpadFrame.from_buffer_copy(refFrame[0])
-        Tmf8829PlotPixelMap.updatePixelMapPlot(imFpPixel, imRefPixelT0, imRefPixelT1, pixelResults, refframe)
+        #refframe = tmf8829RefSpadFrame.from_buffer_copy(refFrame[0])
+        #Tmf8829PlotPixelMap.updatePixelMapPlot(imFpPixel, imRefPixelT0, imRefPixelT1, pixelResults, refframe)
         Tmf8829PlotPixelDistMap.updatePixelDistMapPlot(imFpPixelDist, pixelResults)
 
         plt.pause(0.01)
