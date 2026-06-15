@@ -354,7 +354,8 @@ class Tmf8829AppCommon():
         for y in range(yy):
             for x in range(xx):
                 _idx = Tmf8829AppCommon.PRE_HEADER_SIZE+_header_size+(y*xx+x)*pixelDataSize
-                results[y][x] = Tmf8829AppCommon.getPixelResult(data[_idx:_idx+pixelDataSize], resultFormat)
+                # TN inserted xx-x insteadof x 2026-06-14 for mirroring x
+                results[y][xx-x-1] = Tmf8829AppCommon.getPixelResult(data[_idx:_idx+pixelDataSize], resultFormat)
 
         return results
 

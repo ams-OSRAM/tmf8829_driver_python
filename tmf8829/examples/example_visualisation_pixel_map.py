@@ -17,14 +17,20 @@ from tmf8829_conv import *
 from tmf8829_application import Tmf8829Application
 from tmf8829_application_defines import tmf8829RefSpadFrame
 from utilities.tmf8829_visualisation import Tmf8829PlotPixelMap
+from utilities.tmf8829_visualisation import Tmf8829PlotPixelDistMap
 
+results3dcorrected = True
+resultsInXYZ = True
 ###################################################################################
 ## User Config
 ###################################################################################
 _use_spi = True
-_fpMode = Tmf8829Application.FP_MODE_32x32
-_use_iterations = 500
-_use_period = 100
+#_fpMode = Tmf8829Application.FP_MODE_32x32
+#_fpMode = Tmf8829Application.FP_MODE_48x32
+_fpMode = Tmf8829Application.FP_MODE_32x32s
+#_fpMode = Tmf8829Application.FP_MODE_8x8B
+_use_iterations = 1000 #500
+_use_period = 200#100
 ###################################################################################
 ## Example for the Histogram Visualisation 
 ###################################################################################
@@ -55,24 +61,37 @@ if __name__ == "__main__":
     #------------------------------------------------------------
     # Configuration
     #------------------------------------------------------------
-    app.configure(period=_use_period,fp_mode=_fpMode,nr_peaks=0, noise_strength=1, full_noise=1, publish=1, iterations=_use_iterations)
+    app.configure(period=_use_period,fp_mode=_fpMode,nr_peaks=1, noise_strength=1, full_noise=1, publish=1, iterations=_use_iterations)
     
-    #------------------------------------------------------------
+    #-----------------------------------------------------------
     # Create empty Plot
     #------------------------------------------------------------
     columns = Tmf8829Application.pixelColumns(_fpMode)
     rows = Tmf8829Application.pixelRows(_fpMode)
     imFpPixel, imRefPixelT0, imRefPixelT1 = Tmf8829PlotPixelMap.createEmptyPixelMapPlot(columns, rows)
+    imFpPixelDist = Tmf8829PlotPixelDistMap.createEmptyPixelDistMapPlot(columns, rows)
 
     #------------------------------------------------------------
     # Measurement and Visualisation
     #------------------------------------------------------------
     app.startMeasure()
-    for _ in range(1000):
+    for _ in range(100000):
         resultFrame, histoFrames, refFrame = app.readMeasurementFrames()
-        pixelResults = app.getFullPixelResult(resultFrame)
+        #pixelResults = app.getFullPixelResult(resultFrame)
+        pixelResults = app.getFullPixelResult(frames=resultFrame, toMM=True, pointCloud=results3dcorrected, distanceToXYZ= resultsInXYZ)
+        # for rowsMp in pixelResults:
+        #     for mp in rowsMp:
+        #         for peaks in mp['peaks']:
+        #             if peaks['distance'] != None:
+        #                 distance = peaks['distance']
+        #                 distance1mm = distance / 4 
+        #                 peaks['distance']= distance1mm
+        
+        
         refframe = tmf8829RefSpadFrame.from_buffer_copy(refFrame[0])
         Tmf8829PlotPixelMap.updatePixelMapPlot(imFpPixel, imRefPixelT0, imRefPixelT1, pixelResults, refframe)
+        Tmf8829PlotPixelDistMap.updatePixelDistMapPlot(imFpPixelDist, pixelResults)
+
         plt.pause(0.01)
 
     #------------------------------------------------------------

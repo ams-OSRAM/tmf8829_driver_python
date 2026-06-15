@@ -7,6 +7,8 @@
 
 """Plots an intensity map for all SPADs of the focal plane and the reference macropixels. """
 
+from matplotlib.colors import LinearSegmentedColormap
+
 import __init__
 
 import sys
@@ -81,6 +83,51 @@ class Tmf8829PlotPixelMap():
         imRefPixelT0.set_visible(True)
         imRefPixelT1.set_visible(True)
 
+class Tmf8829PlotPixelDistMap():
+    """The TMF8829 visualisation class for the Pixel Distance Map (TN 2026-06-15++)
+    """
+    def createEmptyPixelDistMapPlot(columns: int = Tmf8829Application.MP_FOV_COLUMNS , rows:int = Tmf8829Application.MP_FOV_ROWS):
+        """Sets up the plot and shows it with blank data."""
+        # Define a custom colormap for depth
+        depth_colors = ["#050505","#c50e0e", "#1fb42e", "#08306b"]  # red via green to dark blue
+        depth_cmap = LinearSegmentedColormap.from_list("custom_depth", depth_colors)
+
+        plt.figure(figsize=(16, 8))
+        gs = plt.GridSpec(2, 2, width_ratios=[2, 1])
+        
+        axFpPixelDist = plt.subplot(gs[:, 0])
+        axFpPixelDist.set_title("Distance Map")
+        imFpPixelDist = axFpPixelDist.imshow(np.zeros((rows, columns), dtype="int64"), cmap=depth_cmap)
+        imFpPixelDist.set_visible(False)
+        #plt.colorbar(imFpPixelDist)
+        plt.colorbar(imFpPixelDist, ax=axFpPixelDist, fraction=0.046, pad=0.04)  # Adjust size and position of colorbar
+        plt.colorbar(imFpPixelDist)
+
+        plt.show(block=False)
+
+        return (imFpPixelDist)
+
+    def updatePixelDistMapPlot( imFpPixelDist,pixelArray):  # pylint: disable=too-many-locals
+        """Updates the images in a plot using data from the sub-measurements."""
+
+        fpPixelDistImage = np.zeros((len(pixelArray), len(pixelArray[0])), dtype="int64")
+       
+        # for y, column in enumerate(pixelArray):
+        #     for x, pixel in enumerate(column):
+        #         fpPixelDistImage[y,x] = x+20*y #pixel["peaks"]
+        for y, column in enumerate(pixelArray):
+            for x, pixel in enumerate(column):
+                for peaks in pixel['peaks']:
+                    fpPixelDistImage[y,x] = peaks['distance']
+ 
+       
+        imFpPixelDist.set_data(fpPixelDistImage)
+       
+        for _ in range(2):
+            # The limits apparently only update when set_clim() is called twice.
+            imFpPixelDist.set_clim(np.min(fpPixelDistImage), np.max(fpPixelDistImage))
+        imFpPixelDist.set_visible(True)
+        
 class Tmf8829PlotHistograms():
     """The TMF8829 visualisation class for the Mp and Ref Mp histograms.
     """
