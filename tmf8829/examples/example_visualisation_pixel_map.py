@@ -56,7 +56,7 @@ if __name__ == "__main__":
     appId = app.hal.txRx( [0], 4 )
     serial = app.readSerialNumber()
     deviceSerialNumber = int.from_bytes(bytes=serial, byteorder="little", signed=False)
-
+    print("[deviceSerialNumber] is: ", f'0x{deviceSerialNumber:08x}') 
     print("[app_id, major, minor, patch] are: ", [f'0x{i:02x}' for i in appId ])
     #------------------------------------------------------------
     # Configuration
